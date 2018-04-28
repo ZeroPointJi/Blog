@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="解析的基本概念解析：从事先规定好的格式中提取数据。 iOS开发常见的解析:XML解析，JSON解析。 XML示例123456789101112131415161718192021&amp;lt;?xml version = &quot;1.0&quot; encoding = &quot;UTF-8&quot;?&amp;gt;&amp;lt;Teachers&amp;gt;    &amp;lt;Teacher&amp;gt;        &amp;lt;name&amp;gt;污源&amp;lt;/n">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS进阶（五）网络数据解析">
+<meta property="og:url" content="http://yoursite.com/2016/03/03/iOS进阶（五）网络数据解析/index.html">
+<meta property="og:site_name" content="ZeroJi&#39;s Blog">
+<meta property="og:description" content="解析的基本概念解析：从事先规定好的格式中提取数据。 iOS开发常见的解析:XML解析，JSON解析。 XML示例123456789101112131415161718192021&amp;lt;?xml version = &quot;1.0&quot; encoding = &quot;UTF-8&quot;?&amp;gt;&amp;lt;Teachers&amp;gt;    &amp;lt;Teacher&amp;gt;        &amp;lt;name&amp;gt;污源&amp;lt;/n">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-27T08:10:57.755Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS进阶（五）网络数据解析">
+<meta name="twitter:description" content="解析的基本概念解析：从事先规定好的格式中提取数据。 iOS开发常见的解析:XML解析，JSON解析。 XML示例123456789101112131415161718192021&amp;lt;?xml version = &quot;1.0&quot; encoding = &quot;UTF-8&quot;?&amp;gt;&amp;lt;Teachers&amp;gt;    &amp;lt;Teacher&amp;gt;        &amp;lt;name&amp;gt;污源&amp;lt;/n">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/03/03/iOS进阶（五）网络数据解析/"/>
+
+
+
+
+
+  <title>iOS进阶（五）网络数据解析 | ZeroJi's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZeroJi's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/03/iOS进阶（五）网络数据解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZeroJi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/icon.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZeroJi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS进阶（五）网络数据解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-03T09:30:00+08:00">
+                2016-03-03
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-04-27T16:10:57+08:00">
+                2018-04-27
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Objective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Objective-C</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="解析的基本概念"><a href="#解析的基本概念" class="headerlink" title="解析的基本概念"></a>解析的基本概念</h2><p>解析：从事先规定好的格式中提取数据。</p>
+<p>iOS开发常见的解析:<code>XML</code>解析，<code>JSON</code>解析。</p>
+<h2 id="XML示例"><a href="#XML示例" class="headerlink" title="XML示例"></a>XML示例</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version = "1.0" encoding = "UTF-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">Teachers</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Teacher</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>污源<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">gender</span>&gt;</span>男<span class="tag">&lt;/<span class="name">gender</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">height</span>&gt;</span>187<span class="tag">&lt;/<span class="name">height</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hobby</span>&gt;</span>LOL<span class="tag">&lt;/<span class="name">hobby</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Teacher</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Teacher</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>瘪犊子<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">gender</span>&gt;</span>男<span class="tag">&lt;/<span class="name">gender</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">height</span>&gt;</span>173<span class="tag">&lt;/<span class="name">height</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hobby</span>&gt;</span>修行<span class="tag">&lt;/<span class="name">hobby</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Teacher</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Teacher</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>新闻<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">gender</span>&gt;</span>女<span class="tag">&lt;/<span class="name">gender</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">height</span>&gt;</span>160<span class="tag">&lt;/<span class="name">height</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">hobby</span>&gt;</span>健身<span class="tag">&lt;/<span class="name">hobby</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">Teacher</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Teachers</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>解释：在本xml文件中有一个根节点<code>&lt;Teachers&gt;&lt;/Teacher&gt;</code>，其中包含4个叶节点<code>&lt;teacher&gt;&lt;/teacher&gt;</code>。</p>
+<h2 id="使用DOM工具解析XML"><a href="#使用DOM工具解析XML" class="headerlink" title="使用DOM工具解析XML"></a>使用DOM工具解析XML</h2><p>DOM工作原理：以栈的方式读入整个XML文档。</p>
+<p>工具：<code>GDataXMLNode</code></p>
+<p>使用方法</p>
+<ul>
+<li>获取<code>GDagaXMLNode.h/m</code>文件，将<code>GDataXMLNode.h/m</code>文件添加到工程中。</li>
+<li>向工程中添加<code>libxml2.dylib</code>动态库。</li>
+<li>在工程的<code>Build Settings</code>页面中找到<code>Header Search Path</code>项，添加<code>/usr/include/libxml2</code>。</li>
+<li>导入<code>GDataXMLNode.h</code>文件到头文件中，如工程能编译通过，则说明添加成功。</li>
+</ul>
+<p>首先对XML文件进行解析</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取文件路径</span></span><br><span class="line">    <span class="built_in">NSString</span> *path = [[<span class="built_in">NSBundle</span> mainBundle] pathForResource:<span class="string">@"Teacher"</span> ofType:<span class="string">@".xml"</span>];</span><br><span class="line">    <span class="comment">// 从文件路径中获取NSData类型的参数</span></span><br><span class="line">    <span class="built_in">NSData</span> *data = [<span class="built_in">NSData</span> dataWithContentsOfFile:path];</span><br><span class="line">    <span class="comment">// 这行代码执行之后，我们对XML文档的解析已经成功了。在Document中保存的是XML文档的 版本号 编码格式 根节点 叶节点 等所有文档信息。如果我们想要数据，只需要对Document进行处理就可以拿到。</span></span><br><span class="line">    GDataXMLDocument *document = [[GDataXMLDocument alloc] initWithData:data options:<span class="number">0</span> error:<span class="literal">nil</span>];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, document);</span><br></pre></td></tr></table></figure>
+<p>获取根节点下所有子节点的对象。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在Document中找到根节点对象</span></span><br><span class="line">   GDataXMLElement *root = document.rootElement;</span><br><span class="line">   <span class="comment">// 获取根节点下的所有子节点对象</span></span><br><span class="line">   <span class="built_in">NSArray</span> *arr = root.children;</span><br></pre></td></tr></table></figure>
+<p>获取其中的数据有2种方法</p>
+<p>一、通过属性找到数据。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GDataXMLElement *root = document.rootElement;</span><br><span class="line">   <span class="built_in">NSArray</span> *arr = [root elementsForName:<span class="string">@"Teacher"</span>];</span><br><span class="line">   GDataXMLElement *name = [[arr[<span class="number">0</span>] elementsForName:<span class="string">@"name"</span>] lastObject];</span><br><span class="line">   <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, [name stringValue]);</span><br></pre></td></tr></table></figure>
+<p>二、使用方法找到数据。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从Document出发，绝对路径</span></span><br><span class="line">   GDataXMLElement *name = [[document nodesForXPath:<span class="string">@"Teachers/Teacher/name"</span> error:<span class="literal">nil</span>] objectAtIndex:<span class="number">0</span>];</span><br><span class="line">   <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, [name stringValue]);</span><br><span class="line">   </span><br><span class="line">   <span class="comment">// 从根节点出发，绝对路径</span></span><br><span class="line">   GDataXMLElement *wuyuan = [[document.rootElement nodesForXPath:<span class="string">@"Teacher/name"</span> error:<span class="literal">nil</span>] objectAtIndex:<span class="number">0</span>];</span><br><span class="line">   <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, [wuyuan stringValue]);</span><br><span class="line">   </span><br><span class="line">   <span class="comment">// 相对路径</span></span><br><span class="line">   GDataXMLElement *name1 = [[document nodesForXPath:<span class="string">@"//name"</span> error:<span class="literal">nil</span>] objectAtIndex:<span class="number">0</span>];</span><br><span class="line">   <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, [name1 stringValue]);</span><br></pre></td></tr></table></figure>
+<h2 id="JSON示例"><a href="#JSON示例" class="headerlink" title="JSON示例"></a>JSON示例</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line"> &#123;<span class="attr">"name"</span>:<span class="string">"洪荒"</span>, <span class="attr">"gender"</span>:<span class="string">"女"</span>, <span class="attr">"age"</span>:<span class="string">"1"</span>&#125;,</span><br><span class="line"> &#123;<span class="attr">"name"</span>:<span class="string">"中二"</span>, <span class="attr">"gender"</span>:<span class="string">"男"</span>, <span class="attr">"age"</span>:<span class="string">"2"</span>&#125;,</span><br><span class="line"> &#123;<span class="attr">"name"</span>:<span class="string">"66"</span>, <span class="attr">"gender"</span>:<span class="string">"女"</span>, <span class="attr">"age"</span>:<span class="string">"18"</span>&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>解释：一个数组中包含3个字典。</p>
+<h2 id="使用Foundation进行JSON解析"><a href="#使用Foundation进行JSON解析" class="headerlink" title="使用Foundation进行JSON解析"></a>使用Foundation进行JSON解析</h2><p>只需2步即可</p>
+<p>一、获取JSON文件路径。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *filePath = [[<span class="built_in">NSBundle</span> mainBundle] pathForResource:<span class="string">@"Student"</span> ofType:<span class="string">@"json"</span>];</span><br><span class="line"><span class="built_in">NSData</span> *data = [<span class="built_in">NSData</span> dataWithContentsOfFile:filePath];</span><br></pre></td></tr></table></figure>
+<p>二、解析JSON数据，使用系统方法JSONObjectWithData:option:error:。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSArray</span> *arr = [<span class="built_in">NSJSONSerialization</span> JSONObjectWithData:data options:<span class="built_in">NSJSONReadingMutableContainers</span> | <span class="built_in">NSJSONReadingMutableLeaves</span> error:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
+<h2 id="XML优缺点"><a href="#XML优缺点" class="headerlink" title="XML优缺点"></a>XML优缺点</h2><p>优点</p>
+<ol>
+<li>格式统一，符合标准。</li>
+<li>容易与其他系统进行远程交互，数据共享比较方便。</li>
+</ol>
+<p>缺点</p>
+<ol>
+<li>XML格式文件庞大，格式复杂，传输占用带宽。</li>
+<li>服务器端和客户端需要花费大量代码来解析XML。</li>
+<li>客户端不同浏览器之间解析XML的方式不一致。</li>
+<li>服务器端和客户端解析XML花费资源和时间。</li>
+</ol>
+<h2 id="JSON优缺点"><a href="#JSON优缺点" class="headerlink" title="JSON优缺点"></a>JSON优缺点</h2><p>优点</p>
+<ol>
+<li>数据格式比较简单，易于读写，格式都是压缩的，占用带宽小。</li>
+<li>易于解析这种语言。</li>
+<li>支持多种语言，便于服务器端解析。</li>
+<li>JSON格式能够直接为服务器端代码使用，大大简化了服务器端和客户端的代码开发量，但是完成的任务不变，且易于维护。</li>
+</ol>
+<p>缺点</p>
+<ol>
+<li>没有XML格式的使用广泛，没有XMl的通用性。</li>
+<li>JSON格式目前在Web Service中推广还属于初级阶段。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/01/Swift（三）集合类型/" rel="next" title="Switf（三）集合类型">
+                <i class="fa fa-chevron-left"></i> Switf（三）集合类型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/03/Swift（四）控制流/" rel="prev" title="Switf（四）控制流">
+                Switf（四）控制流 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/icon.jpg"
+                alt="ZeroJi" />
+            
+              <p class="site-author-name" itemprop="name">ZeroJi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解析的基本概念"><span class="nav-number">1.</span> <span class="nav-text">解析的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML示例"><span class="nav-number">2.</span> <span class="nav-text">XML示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用DOM工具解析XML"><span class="nav-number">3.</span> <span class="nav-text">使用DOM工具解析XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON示例"><span class="nav-number">4.</span> <span class="nav-text">JSON示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Foundation进行JSON解析"><span class="nav-number">5.</span> <span class="nav-text">使用Foundation进行JSON解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML优缺点"><span class="nav-number">6.</span> <span class="nav-text">XML优缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON优缺点"><span class="nav-number">7.</span> <span class="nav-text">JSON优缺点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZeroJi</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

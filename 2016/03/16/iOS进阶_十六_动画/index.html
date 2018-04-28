@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="iOS," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="头尾式动画iOS 4.0之前, 如果想要实现动画, 采用的都是类方法. 除了需要设定改变视图的是哪个属性做动画之外, 还需要实现方法, 来标记动画的开始和结束. 123456789101112131415161718192021222324252627282930313233343536373839UIView *v = [UIView]alloc] initWithFrame:CGRectMak">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS进阶（十六）动画">
+<meta property="og:url" content="http://yoursite.com/2016/03/16/iOS进阶_十六_动画/index.html">
+<meta property="og:site_name" content="ZeroJi&#39;s Blog">
+<meta property="og:description" content="头尾式动画iOS 4.0之前, 如果想要实现动画, 采用的都是类方法. 除了需要设定改变视图的是哪个属性做动画之外, 还需要实现方法, 来标记动画的开始和结束. 123456789101112131415161718192021222324252627282930313233343536373839UIView *v = [UIView]alloc] initWithFrame:CGRectMak">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-27T08:10:57.799Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS进阶（十六）动画">
+<meta name="twitter:description" content="头尾式动画iOS 4.0之前, 如果想要实现动画, 采用的都是类方法. 除了需要设定改变视图的是哪个属性做动画之外, 还需要实现方法, 来标记动画的开始和结束. 123456789101112131415161718192021222324252627282930313233343536373839UIView *v = [UIView]alloc] initWithFrame:CGRectMak">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/03/16/iOS进阶_十六_动画/"/>
+
+
+
+
+
+  <title>iOS进阶（十六）动画 | ZeroJi's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZeroJi's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/16/iOS进阶_十六_动画/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZeroJi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/icon.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZeroJi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS进阶（十六）动画</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-16T11:50:00+08:00">
+                2016-03-16
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-04-27T16:10:57+08:00">
+                2018-04-27
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Objective-C/" itemprop="url" rel="index">
+                    <span itemprop="name">Objective-C</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="头尾式动画"><a href="#头尾式动画" class="headerlink" title="头尾式动画"></a>头尾式动画</h2><p>iOS 4.0之前, 如果想要实现动画, 采用的都是类方法.</p>
+<p>除了需要设定改变视图的是哪个属性做动画之外, 还需要实现方法, 来标记动画的开始和结束.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">UIView</span> *v = [<span class="built_in">UIView</span>]alloc] initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>)];</span><br><span class="line">v.backgroundColor = [<span class="built_in">UIColor</span> redColor];</span><br><span class="line">[<span class="keyword">self</span>.view addSubview:v];</span><br><span class="line">            </span><br><span class="line"><span class="comment">// 开始设置 UIView 基础动画</span></span><br><span class="line">[<span class="built_in">UIView</span> beginAnimations:<span class="string">@"strenth"</span> context:<span class="literal">nil</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置动画时长为2s</span></span><br><span class="line">[<span class="built_in">UIView</span> setAnimationDuration:<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置重复次数</span></span><br><span class="line">[<span class="built_in">UIView</span> setAnimationRepeatCount:<span class="number">3</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置动画播放的回调对象</span></span><br><span class="line"><span class="comment">//    [UIView setAnimationDelegate:self];</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置动画过渡方式</span></span><br><span class="line">[<span class="built_in">UIView</span> setAnimationCurve:<span class="built_in">UIViewAnimationCurveEaseInOut</span>];</span><br><span class="line"><span class="comment">// 第一个参数设定动画执行方向, 第二个参数制定动画视图, 第三个参数制定是否使用图片缓存, 如果是YES, 效果更佳</span></span><br><span class="line">[<span class="built_in">UIView</span> setAnimationTransition:<span class="built_in">UIViewAnimationTransitionFlipFromLeft</span> forView:v cache:<span class="literal">YES</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 设置开始方法和结束方法</span></span><br><span class="line"><span class="comment">//    [UIView setAnimationWillStartSelector:@selector(animationDidStart: context:)];</span></span><br><span class="line"><span class="comment">//    [UIView setAnimationDidStopSelector:@selector(animationDidStop:finished:context:)];</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 改变它的 frame 的 x, y 的值, 即设置动画的最终值</span></span><br><span class="line"><span class="comment">//    v.frame = CGRectMake(200, 200, 100, 100);</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 改变颜色</span></span><br><span class="line"><span class="comment">//    v.backgroundColor = [UIColor blueColor];</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 改变透明度</span></span><br><span class="line"><span class="comment">//    v.alpha = 0.0;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//v.transform = CGAffineTransformMakeScale(2, 0.5);</span></span><br><span class="line"><span class="comment">//    v.transform = CGAffineTransformMakeRotation(M_PI);</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 开始播放动画</span></span><br><span class="line">[<span class="built_in">UIView</span> commitAnimations];</span><br></pre></td></tr></table></figure>
+<p>因为设置了开始方法和结束方法, 所以要实现开始结束方法.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)animationDidStart:(<span class="built_in">NSString</span> *)animationID context:(<span class="keyword">void</span> *)context &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@ %@"</span>, animationID, context);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (<span class="keyword">void</span>)animationDidStop:(<span class="built_in">NSString</span> *)animationID finished:(<span class="built_in">NSNumber</span> *)finished context:(<span class="keyword">void</span> *)context &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@ %@"</span>, animationID, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="block动画"><a href="#block动画" class="headerlink" title="block动画"></a>block动画</h2><p>简单动画</p>
+<p>参数1: 动画持续时间, 参数2: 动画执行体, 参数3: 动画结束时执行的block</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">UIView</span> animateWithDuration:<span class="number">3</span> animations:^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"start"</span>);</span><br><span class="line">    v.center = <span class="keyword">self</span>.view.center;</span><br><span class="line">&#125; completion:^(<span class="built_in">BOOL</span> finished) &#123;</span><br><span class="line">    <span class="keyword">if</span> (finished) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"stop"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<p>复杂动画</p>
+<p>参数1: 动画持续时间, 参数2: 动画执行前延迟的时间, 参数3: 动画执行方式, 参数4: 动画执行体, 参数5: 动画结束时执行的<code>block</code>.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">UIView</span> animateWithDuration:<span class="number">0.5</span> delay:<span class="number">3</span> options:<span class="built_in">UIViewAnimationOptionRepeat</span> animations:^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"start"</span>);</span><br><span class="line">    v.center = <span class="keyword">self</span>.view.center;</span><br><span class="line">&#125; completion:^(<span class="built_in">BOOL</span> finished) &#123;</span><br><span class="line">    <span class="keyword">if</span> (finished) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"stop"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<p>关键帧动画</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">UIView</span> animateKeyframesWithDuration:<span class="number">3</span> delay:<span class="number">0.0</span> options:<span class="built_in">UIViewKeyframeAnimationOptionAutoreverse</span> animations:^&#123;</span><br><span class="line">    <span class="comment">// startTime 和 relativeDuration 都是相对于整个关键帧动画的持续时间的百分比</span></span><br><span class="line">    [<span class="built_in">UIView</span> addKeyframeWithRelativeStartTime:<span class="number">0.0</span> relativeDuration:<span class="number">0.25</span> animations:^&#123;</span><br><span class="line">        v.center = <span class="keyword">self</span>.view.center;</span><br><span class="line">    &#125;];</span><br><span class="line">&#125; completion:^(<span class="built_in">BOOL</span> finished) &#123;</span><br><span class="line">    <span class="keyword">if</span> (finished) &#123;</span><br><span class="line">        <span class="built_in">NSLog</span>(<span class="string">@"finished"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+<p>spring动画</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">UIView</span> animateWithDuration:<span class="number">3.0</span> <span class="comment">// 动画时长</span></span><br><span class="line">                      delay:<span class="number">0.0</span> <span class="comment">// 动画延迟</span></span><br><span class="line">     usingSpringWithDamping:<span class="number">0.5</span> <span class="comment">// 类似弹簧效果 0~1</span></span><br><span class="line">      initialSpringVelocity:<span class="number">15.0</span> <span class="comment">// 初始速度</span></span><br><span class="line">                     options:<span class="built_in">UIViewAnimationOptionCurveEaseOut</span> <span class="comment">// 动画过度效果</span></span><br><span class="line">                  animations:^&#123; <span class="comment">// 执行的block</span></span><br><span class="line">                        v.center = <span class="keyword">self</span>.view.center;</span><br><span class="line">                    &#125; completion:^(<span class="built_in">BOOL</span> finished) &#123; <span class="comment">// 结束后执行的block</span></span><br><span class="line">                        <span class="keyword">if</span> (finished) &#123;</span><br><span class="line">                            <span class="built_in">NSLog</span>(<span class="string">@"finished"</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;];</span><br></pre></td></tr></table></figure>
+<h2 id="CoreAnimation动画"><a href="#CoreAnimation动画" class="headerlink" title="CoreAnimation动画"></a>CoreAnimation动画</h2><p>CoreAnimation 基本介绍</p>
+<ul>
+<li><code>CoreAnimation</code> 动画位于 <code>iOS</code> 框架的 <code>Media</code> 层</li>
+<li><code>CoreAnimation</code> 动画实现需要添加 <code>QuartzCore.Framework</code></li>
+<li><code>CoreAnimation</code> 基本上是 <code>layer Animation</code></li>
+</ul>
+<p>CALayer 基本介绍</p>
+<ul>
+<li><code>CALayer</code> 负责绘制, 提供 <code>UIView</code> 需要展示的内容, 不能交互.</li>
+<li><code>UIView</code> 负责交互, 显示 <code>CALayer</code> 绘制的内容.</li>
+</ul>
+<p><code>CALayer</code> 层是屏幕上的一个矩形区域, 在每一个 <code>UIView</code> 中都包含一个根<code>CALayer</code>, 在 <code>UIView</code> 上的所有视觉效果都是在这个 <code>Layer</code> 上进行的.</p>
+<p><code>CALayer</code> 外形特征主要包括:</p>
+<ol>
+<li>层的大小尺寸</li>
+<li>背景颜色</li>
+<li>内容(可以填充图片或者使用 <code>Core Graphics</code> 绘制的内容)</li>
+<li>矩形是否使用圆角</li>
+<li>矩形是否有阴影</li>
+</ol>
+<p><code>Layer</code> 有很多种, 最常用也是最基本的是 <code>CALayer</code>, 当然还包括其他子类:</p>
+<ul>
+<li><code>CAScrollerLayer</code> 简化显示层的一部分</li>
+<li><code>CATextLayer</code> 文本层</li>
+<li><code>CAGradientLayer</code> <code>CAShapeLayer</code> 等等</li>
+</ul>
+<p><code>UIView</code> 是 <code>iOS</code> 系统中界面元素的基础, 所有的界面元素都是继承自它. 它本身完全是由 <code>CoreAnimation</code> 来实现的. 它真正的绘制部分, 是由一个 <code>CALayer</code> 类来管理的. <code>UIView</code> 本身更像是一个 <code>CALayer</code> 的管理器, 访问它的跟绘图和跟坐标有关的属性, 例如 <code>frame</code>, <code>bounds</code> 等, 实际上内部都是在访问它所包含的 <code>CALayer</code> 的相关属性.</p>
+<p><code>UIView</code> 有个重要属性 <code>layer</code>, 可以返回它的主 <code>CALayer</code> 实例.</p>
+<p><code>UIView</code> 的 <code>CALayer</code> 类似 <code>UIView</code> 的子 <code>View</code> 树形结构, 也可以向它的 <code>layer</code> 上添加子 <code>layer</code>, 来完成某些特殊的表示. 即 <code>CALayer</code> 层是可以嵌套的.</p>
+<p><code>CALayer</code> 的常用属性:</p>
+<ul>
+<li><code>cornerRadius</code> 圆角</li>
+<li><code>shadowColor</code> 阴影颜色</li>
+<li><code>shadowOffset</code> 阴影偏移距离</li>
+<li><code>shadowRadius</code> 阴影模糊程度</li>
+<li><code>shadowOpacity</code> 阴影透明度</li>
+<li><code>borderWidth</code> 边框宽度</li>
+<li><code>borderColor</code> 边框颜色</li>
+<li><code>anchorPoint</code> 锚点</li>
+<li><code>position</code> 当前位置信息</li>
+<li><code>transfrom</code> 使 <code>CALayer</code> 产生3D空间内的平移, 缩放, 旋转等变化</li>
+</ul>
+<p><code>CABasicAnimation</code> 动画</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建一个 basic 动画</span></span><br><span class="line"><span class="comment">// keyPath 必须填写 CALayer 能做动画的属性, 或者这些属性中的值.</span></span><br><span class="line"><span class="comment">//    CABasicAnimation *basic = [CABasicAnimation animationWithKeyPath:@"position.y"];</span></span><br><span class="line"><span class="comment">//    CABasicAnimation *basic = [CABasicAnimation animationWithKeyPath:@"cornerRadius"];</span></span><br><span class="line"><span class="built_in">CABasicAnimation</span> *basic = [<span class="built_in">CABasicAnimation</span> animationWithKeyPath:<span class="string">@"backgroundColor"</span>];</span><br><span class="line">basic.toValue = (__bridge <span class="keyword">id</span> _Nullable)([<span class="built_in">UIColor</span> redColor].CGColor);</span><br><span class="line"></span><br><span class="line"><span class="comment">// NSNumber 这个类的作用是将基本数据类型与对象类型实现互转</span></span><br><span class="line"><span class="comment">// NSValue 这个类的作用是将结构体与对象类型实现互转</span></span><br><span class="line"><span class="comment">//    basic.fromValue = @(self.imageView.layer.position.y);</span></span><br><span class="line"><span class="comment">//    basic.toValue = @400;</span></span><br><span class="line"><span class="comment">//    basic.byValue = @300;</span></span><br><span class="line"></span><br><span class="line">basic.duration = <span class="number">3</span>;</span><br><span class="line">basic.repeatCount = <span class="number">2</span>;</span><br><span class="line"><span class="comment">//    basic.delegate = self;</span></span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.imageView.layer addAnimation:basic forKey:<span class="string">@"y动画"</span>];</span><br></pre></td></tr></table></figure>
+<p>如果想在动画之后保持动画动画结束的状态, 可以实现结束之后的代理方法, 来将状态保存, 直接修改 <code>layer</code> 的状态是不可取的.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)animationDidStop:(<span class="built_in">CAAnimation</span> *)anim finished:(<span class="built_in">BOOL</span>)flag</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (flag) &#123;</span><br><span class="line">        <span class="comment">// 保持动画最后的结束状态</span></span><br><span class="line">        <span class="built_in">CGPoint</span> position = <span class="keyword">self</span>.imageView.layer.position;</span><br><span class="line">        position.y = <span class="number">400</span>;</span><br><span class="line">        <span class="keyword">self</span>.imageView.layer.position = position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>CAKeyframeAnimation</code> 动画</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CAKeyframeAnimation</span> *keyFrame = [<span class="built_in">CAKeyframeAnimation</span> animationWithKeyPath:<span class="string">@"position.x"</span>];</span><br><span class="line"><span class="built_in">CGFloat</span> center = <span class="keyword">self</span>.imageView.layer.position.x;</span><br><span class="line"><span class="built_in">CGFloat</span> left = center - <span class="number">5</span>;</span><br><span class="line"><span class="built_in">CGFloat</span> right = center + <span class="number">5</span>;</span><br><span class="line"><span class="comment">// 转换为对象</span></span><br><span class="line"><span class="built_in">NSNumber</span> *c = [<span class="built_in">NSNumber</span> numberWithFloat:center];</span><br><span class="line"><span class="built_in">NSNumber</span> *l = [<span class="built_in">NSNumber</span> numberWithFloat:left];</span><br><span class="line"><span class="built_in">NSNumber</span> *r = [<span class="built_in">NSNumber</span> numberWithFloat:right];</span><br><span class="line">keyFrame.values = @[c, l, c, r, c, l, c, r, c, l, c, r, c, l, c];</span><br><span class="line">keyFrame.duration = <span class="number">0.1</span>;</span><br><span class="line">keyFrame.repeatCount = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.imageView.layer addAnimation:keyFrame forKey:<span class="string">@"晃动"</span>];</span><br></pre></td></tr></table></figure>
+<p><code>CAAnimationGroup</code> 动画</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建组动画</span></span><br><span class="line"><span class="built_in">CAAnimationGroup</span> *group = [<span class="built_in">CAAnimationGroup</span> animation];</span><br><span class="line">group.duration = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开始创建内部动画</span></span><br><span class="line"><span class="built_in">CABasicAnimation</span> *basic = [<span class="built_in">CABasicAnimation</span> animationWithKeyPath:<span class="string">@"position.y"</span>];</span><br><span class="line">basic.duration = <span class="number">2</span>;</span><br><span class="line">basic.toValue = @<span class="number">400</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 第二个动画</span></span><br><span class="line"><span class="built_in">CABasicAnimation</span> *basic1 = [<span class="built_in">CABasicAnimation</span> animationWithKeyPath:<span class="string">@"opacity"</span>];</span><br><span class="line">basic1.duration = <span class="number">3</span>;</span><br><span class="line">basic1.toValue = @<span class="number">0.3</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将创建的内部动画加入组动画中</span></span><br><span class="line">group.animations = @[basic, basic1];</span><br><span class="line"></span><br><span class="line">[<span class="keyword">self</span>.imageView.layer addAnimation:group forKey:<span class="string">@"屌爆"</span>];</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/14/Swift_十四_析构过程/" rel="next" title="Swift (十四) 析构过程">
+                <i class="fa fa-chevron-left"></i> Swift (十四) 析构过程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/17/iOS_八_PHP后台开发/" rel="prev" title="iOS进阶（八）PHP后台开发">
+                iOS进阶（八）PHP后台开发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/icon.jpg"
+                alt="ZeroJi" />
+            
+              <p class="site-author-name" itemprop="name">ZeroJi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#头尾式动画"><span class="nav-number">1.</span> <span class="nav-text">头尾式动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#block动画"><span class="nav-number">2.</span> <span class="nav-text">block动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CoreAnimation动画"><span class="nav-number">3.</span> <span class="nav-text">CoreAnimation动画</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZeroJi</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

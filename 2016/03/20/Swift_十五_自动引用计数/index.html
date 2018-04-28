@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Swift," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="自动引用计数引用计数仅仅应用于类的实例 1234567891011121314151617181920212223class Person &amp;#123;    let name: String    init(name: String) &amp;#123;        self.name = name        print(&quot;\(name) is being initialized&quot;)    &amp;#">
+<meta name="keywords" content="Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift (十五) 引用计数">
+<meta property="og:url" content="http://yoursite.com/2016/03/20/Swift_十五_自动引用计数/index.html">
+<meta property="og:site_name" content="ZeroJi&#39;s Blog">
+<meta property="og:description" content="自动引用计数引用计数仅仅应用于类的实例 1234567891011121314151617181920212223class Person &amp;#123;    let name: String    init(name: String) &amp;#123;        self.name = name        print(&quot;\(name) is being initialized&quot;)    &amp;#">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-27T08:10:57.807Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swift (十五) 引用计数">
+<meta name="twitter:description" content="自动引用计数引用计数仅仅应用于类的实例 1234567891011121314151617181920212223class Person &amp;#123;    let name: String    init(name: String) &amp;#123;        self.name = name        print(&quot;\(name) is being initialized&quot;)    &amp;#">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/03/20/Swift_十五_自动引用计数/"/>
+
+
+
+
+
+  <title>Swift (十五) 引用计数 | ZeroJi's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ZeroJi's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/03/20/Swift_十五_自动引用计数/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZeroJi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/icon.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZeroJi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swift (十五) 引用计数</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-03-20T08:15:00+08:00">
+                2016-03-20
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-04-27T16:10:57+08:00">
+                2018-04-27
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Swift/" itemprop="url" rel="index">
+                    <span itemprop="name">Swift</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="自动引用计数"><a href="#自动引用计数" class="headerlink" title="自动引用计数"></a>自动引用计数</h2><p>引用计数仅仅应用于类的实例</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"\(name) is being initialized"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">deinit</span> &#123; <span class="comment">// 当实例被将要没销毁时调用</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> reference1: <span class="type">Person</span>?</span><br><span class="line"><span class="keyword">var</span> reference2: <span class="type">Person</span>?</span><br><span class="line"><span class="keyword">var</span> reference3: <span class="type">Person</span>?</span><br><span class="line"></span><br><span class="line">reference1 = <span class="type">Person</span>(name: <span class="string">"John Appleseed"</span>)</span><br><span class="line">reference2 = reference1</span><br><span class="line">reference3 = reference1 <span class="comment">// 至此, 一个实例被三个变量引用</span></span><br><span class="line"></span><br><span class="line">reference1 = <span class="literal">nil</span></span><br><span class="line">reference2 = <span class="literal">nil</span> <span class="comment">// 至此, 一个实例仅被一个变量引用</span></span><br><span class="line"></span><br><span class="line">reference3 = <span class="literal">nil</span> <span class="comment">// 实例被销毁, 打印结果</span></span><br></pre></td></tr></table></figure>
+<h2 id="类实例之间的循环强引用"><a href="#类实例之间的循环强引用" class="headerlink" title="类实例之间的循环强引用"></a>类实例之间的循环强引用</h2><p>当两个类的实例互相持有对方的强引用, 因而每个实例都让对方一直存在. 这就是所谓的强引用.</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">People</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>) &#123; <span class="keyword">self</span>.name = name  &#125;</span><br><span class="line">        <span class="keyword">var</span> apartment: <span class="type">Apartment</span>?</span><br><span class="line">        <span class="keyword">deinit</span> &#123; <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Apartment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> unit: <span class="type">String</span></span><br><span class="line">    <span class="keyword">init</span>(unit: <span class="type">String</span>) &#123; <span class="keyword">self</span>.unit = unit  &#125;</span><br><span class="line">        <span class="keyword">var</span> tenat: <span class="type">People</span>?</span><br><span class="line">        <span class="keyword">deinit</span> &#123; <span class="built_in">print</span>(<span class="string">"Apartment \(unit) is being deiniialized"</span>)  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> john: <span class="type">People</span>?</span><br><span class="line"><span class="keyword">var</span> unit4A: <span class="type">Apartment</span>?</span><br><span class="line">john!.apartment = unit4A</span><br><span class="line">unit4A!.tenat = john</span><br></pre></td></tr></table></figure>
+<h2 id="解决实例之间的循环强引用"><a href="#解决实例之间的循环强引用" class="headerlink" title="解决实例之间的循环强引用"></a>解决实例之间的循环强引用</h2><p><code>Swift</code> 提供了两种办法来解决使用类的属性时遇到的循环强引用问题:</p>
+<p>弱引用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewPerson</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>) &#123; <span class="keyword">self</span>.name = name  &#125;</span><br><span class="line">        <span class="keyword">var</span> apartment: <span class="type">NewApartment</span>?</span><br><span class="line">        <span class="keyword">deinit</span> &#123; <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewApartment</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> unit: <span class="type">String</span></span><br><span class="line">    <span class="keyword">init</span>(unit: <span class="type">String</span>) &#123; <span class="keyword">self</span>.unit = unit  &#125;</span><br><span class="line">        <span class="keyword">weak</span> <span class="keyword">var</span> tenat: <span class="type">NewPerson</span>? <span class="comment">// 弱引用</span></span><br><span class="line">        <span class="keyword">deinit</span> &#123; <span class="built_in">print</span>(<span class="string">"Apartment \(unit) is being deiniialized"</span>)  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> john: <span class="type">NewPerson</span>?</span><br><span class="line"><span class="keyword">var</span> unit4A: <span class="type">NewApartment</span>?</span><br><span class="line"></span><br><span class="line">john = <span class="type">NewPerson</span>(name: <span class="string">"John Appleseed"</span>)</span><br><span class="line">unit4A = <span class="type">NewApartment</span>(unit: <span class="string">"4A"</span>)</span><br><span class="line"></span><br><span class="line">john!.apartment = unit4A</span><br><span class="line">unit4A!.tenat = john</span><br><span class="line"></span><br><span class="line">john = <span class="literal">nil</span></span><br><span class="line">unit4A = <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+<p>无主引用</p>
+<p>和弱引用类似, 无主引用不会老保持引用的实例, 和弱引用不同的是, 无主引用是永远有值的. 因此, 无主引用总是定义为非可选类型.</p>
+<p>如果视图在实例被销毁后, 访问该实例的无主引用, 会触发运行错误. 使用无主引用, 必须确保引用始终指向一个未销毁的实例.</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">var</span> card: <span class="type">CreditCard</span>?</span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">deinit</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CreditCard</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> number: <span class="type">UInt64</span></span><br><span class="line">    <span class="keyword">unowned</span> <span class="keyword">let</span> customer: <span class="type">Customer</span></span><br><span class="line">    <span class="keyword">init</span>(number: <span class="type">UInt64</span>, customer: <span class="type">Customer</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.number = number</span><br><span class="line">        <span class="keyword">self</span>.customer = customer</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">deinit</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"Card #\(number) is being deinitialized"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> jim: <span class="type">Customer</span>?</span><br><span class="line"></span><br><span class="line">jim = <span class="type">Customer</span>(name: <span class="string">"Jim Appleseed"</span>)</span><br><span class="line">jim!.card = <span class="type">CreditCard</span>(number: <span class="number">1234_5678_90123_3456</span>, customer: jim!)</span><br><span class="line"></span><br><span class="line">jim = <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+<h2 id="无主引用以及隐式解析可选属性"><a href="#无主引用以及隐式解析可选属性" class="headerlink" title="无主引用以及隐式解析可选属性"></a>无主引用以及隐式解析可选属性</h2><p>两个属性都必须有值, 并且初始化完成后永远不为 <code>nil</code>, 需要一个类使用无主引用, 另一个类使用隐式解析可选属性.</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Country</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">var</span> capitalCity: <span class="type">City</span>!</span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, capitalName: <span class="type">String</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="keyword">self</span>.capitalCity = <span class="type">City</span>(name: capitalName, country: <span class="keyword">self</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">City</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">unowned</span> <span class="keyword">let</span> country: <span class="type">Country</span></span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, country: <span class="type">Country</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="keyword">self</span>.country = country</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> country = <span class="type">Country</span>(name: <span class="string">"Canada"</span>, capitalName: <span class="string">"Ottawa"</span>) <span class="comment">// 可以通过一条语句同事创建 Country 和 City 的实例, 而不产生循环强引用, 并且 capitalCity 的属性能被直接访问, 而不需要通过感叹号来展开它的可选值</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">"\(country.name)'s capital city is called \(country.capitalCity.name)"</span>)<span class="string">"'"</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="闭包引起的循环引用"><a href="#闭包引起的循环引用" class="headerlink" title="闭包引起的循环引用"></a>闭包引起的循环引用</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HTMLElement</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">let</span> text: <span class="type">String</span>?</span><br><span class="line">             </span><br><span class="line">    <span class="built_in">lazy</span> <span class="keyword">var</span> asHTML: <span class="type">Void</span> -&gt; <span class="type">String</span> = &#123;</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> text = <span class="keyword">self</span>.text &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;\(self.name)&gt;\(text)/\(self.name)&gt;"</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;\(self.name) /&gt;"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">             </span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, text: <span class="type">String</span>? = <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="keyword">self</span>.text = text</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">deinit</span> &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> heading = <span class="type">HTMLElement</span>(name: <span class="string">"h1"</span>)</span><br><span class="line"><span class="keyword">let</span> defaultText = <span class="string">"some default text"</span></span><br><span class="line">heading.asHTML = &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&lt;\(heading.name)&gt;\(heading.text ?? defaultText)&lt;/\(heading.name)&gt;"</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">print</span>(heading.asHTML)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> paragraph: <span class="type">HTMLElement</span>? = <span class="type">HTMLElement</span>(name: <span class="string">"p"</span>, text: <span class="string">"hello, world"</span>)</span><br><span class="line"><span class="built_in">print</span>(paragraph!.asHTML)</span><br><span class="line"></span><br><span class="line">paragraph = <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+<h2 id="解决闭包引起的循环强引用"><a href="#解决闭包引起的循环强引用" class="headerlink" title="解决闭包引起的循环强引用"></a>解决闭包引起的循环强引用</h2><p><code>Swift</code> 有以下要求: 只要在闭包内使用 <code>self</code> 成员, 就要使用 <code>self.someProperty</code> 或者 <code>self.someMethod()</code>.</p>
+<h2 id="定义捕获列表"><a href="#定义捕获列表" class="headerlink" title="定义捕获列表"></a>定义捕获列表</h2><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> someclosure: (<span class="type">Int</span>, <span class="type">String</span>) -&gt; <span class="type">String</span> = &#123;</span><br><span class="line">    [<span class="keyword">unowned</span> <span class="keyword">self</span>, <span class="keyword">weak</span> delegate = <span class="keyword">self</span>.deleage!](index: <span class="type">Int</span>, stringToProcess: <span class="type">String</span>) -&gt; <span class="type">String</span> <span class="keyword">in</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">lazy</span> <span class="keyword">var</span> someclosure: <span class="type">Void</span> -&gt; <span class="type">String</span> = &#123;</span><br><span class="line">    [<span class="keyword">unowned</span> <span class="keyword">self</span>, <span class="keyword">weak</span> delegate = <span class="keyword">self</span>.delegate!] <span class="keyword">in</span></span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>// 弱引用和无主引用</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewHTMLElement</span> </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> name: <span class="type">String</span></span><br><span class="line">    <span class="keyword">let</span> text: <span class="type">String</span>?</span><br><span class="line">             </span><br><span class="line">    laze <span class="keyword">var</span> asHTML: <span class="type">Void</span> -&gt; <span class="type">String</span> = &#123;</span><br><span class="line">        [<span class="keyword">unowned</span> <span class="keyword">self</span>]<span class="keyword">in</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">let</span> text = <span class="keyword">self</span>.text &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;\(self.name)&gt;\(text)&lt;/\(self.name)"</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"&lt;\(self.name) /&gt;"</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">                             </span><br><span class="line">    <span class="keyword">init</span>(name: <span class="type">String</span>, text: <span class="type">String</span>? = <span class="literal">nil</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.name = name</span><br><span class="line">        <span class="keyword">self</span>.text = text</span><br><span class="line">    &#125;</span><br><span class="line">         </span><br><span class="line">    <span class="keyword">deinit</span> &#123;</span><br><span class="line">       <span class="built_in">print</span>(<span class="string">"\(name) is being deinitialized"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> newParagraph: <span class="type">NewHTMLElement</span>? = <span class="type">NewHTMLElement</span>(name: <span class="string">"p"</span>, text: <span class="string">"hello, world"</span>)</span><br><span class="line"><span class="built_in">print</span>(newParagraph!.asHTML)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Swift/" rel="tag"># Swift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/20/Swift_十六_可选链式调用/" rel="next" title="Swift (十六) 可选链式调用">
+                <i class="fa fa-chevron-left"></i> Swift (十六) 可选链式调用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/22/Swift_十七_错误处理/" rel="prev" title="Swift (十七) 错误处理">
+                Swift (十七) 错误处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/icon.jpg"
+                alt="ZeroJi" />
+            
+              <p class="site-author-name" itemprop="name">ZeroJi</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">49</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动引用计数"><span class="nav-number">1.</span> <span class="nav-text">自动引用计数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类实例之间的循环强引用"><span class="nav-number">2.</span> <span class="nav-text">类实例之间的循环强引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决实例之间的循环强引用"><span class="nav-number">3.</span> <span class="nav-text">解决实例之间的循环强引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无主引用以及隐式解析可选属性"><span class="nav-number">4.</span> <span class="nav-text">无主引用以及隐式解析可选属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#闭包引起的循环引用"><span class="nav-number">5.</span> <span class="nav-text">闭包引起的循环引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决闭包引起的循环强引用"><span class="nav-number">6.</span> <span class="nav-text">解决闭包引起的循环强引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义捕获列表"><span class="nav-number">7.</span> <span class="nav-text">定义捕获列表</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZeroJi</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
