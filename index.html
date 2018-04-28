@@ -635,183 +635,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/24/iOS离线模式/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ZeroJi">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/icon.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZeroJi's Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2016/06/24/iOS离线模式/" itemprop="url">iOS离线模式</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-06-24T02:00:00+08:00">
-                2016-06-24
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于&#58;</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2018-04-28T17:02:59+08:00">
-                2018-04-28
-              </time>
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/iOS/" itemprop="url" rel="index">
-                    <span itemprop="name">iOS</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="离线模式"><a href="#离线模式" class="headerlink" title="离线模式"></a>离线模式</h3><p>这几天公司有新需求, 当网络异常或没有网络时显示上次显示过的页面. 我将这个需求剖析开来, 分成两个问题:</p>
-<ol>
-<li>完成图片缓存</li>
-<li>完成数据本地存储</li>
-</ol>
-<p>接下来的开发就围绕这两个问题进行解决.</p>
-<h3 id="图片缓存"><a href="#图片缓存" class="headerlink" title="图片缓存"></a>图片缓存</h3><p>说起图片时, 我第一个是想到了 <code>SDWebImage</code>, 但因为之前没有深入研究过, 做了不少的傻事. 例如: 将 <code>SDWebImage</code> 再次封装成一个延展, 手动实现图片的本地缓存, 手动搜索并判断图片的存在, 手动提取本地图片等. 但是后来发现, 只要调用 <code>sd_setImage:</code> 这个方法, 本地会出现两张同名的图片, 实在令人费解. 经过测试后确认, 以上的一切 <code>SDWebImage</code> 已经帮我们做好了. 仅仅只要调用 <code>sd</code> 开头的设置图片方法, 就能自动进行本地缓存.</p>
-<p><code>SDWebImage</code> 缓存图片的原理, 在我个人的理解上是: 显示占位图-&gt; 从内存中查找图片 -&gt; 从磁盘中查找图片 -&gt; 根据 <code>url</code> 下载图片 -&gt; 显示图片. 当从内存或磁盘中找到图片时, 直接略过后面步骤显示图片.</p>
-<p>当然, 手动图片缓存图片也有它的可取之处, 灵活性很高, 可以自行判断是否缓存图片, 自定义图片缓存地址, 最大并发数, 图片缓存策略等.</p>
-<p>本地缓存类 <code>SDWebImage</code> 中的 <code>SDImageCache</code>. <code>SDImageCache</code> 是个单例类, 使用以下代码获取. 这样图片缓存路径为沙盒路径下的<code>Library/Caches/default</code>.</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 直接获取默认对象 */</span></span><br><span class="line">+ (SDImageCache *)sharedImageCache;</span><br></pre></td></tr></table></figure>
-<p>当然, 自定义缓存空间也是可行的.</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 在沙盒的cache目录下创建一个指定名字的缓存空间(文件夹) */</span></span><br><span class="line">- (instanstype)initWithNamespace:(<span class="built_in">NSString</span> *)ns;</span><br></pre></td></tr></table></figure>
-<p>存储图片到内存和磁盘上</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 在内存和磁盘上存储一个图片(key参数是图片的唯一标识符) */</span></span><br><span class="line">- (<span class="keyword">void</span>)storeImage:(<span class="built_in">UIImage</span> *)image forkey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">/** 缓存一个图片到内存, 并设置是否缓存到磁盘上 */</span></span><br><span class="line">- (<span class="keyword">void</span>)storeImage:(<span class="built_in">UIImage</span> *)image forKey:(<span class="built_in">NSString</span> *)key toDisk:(<span class="built_in">BOOL</span>)toDisk;</span><br></pre></td></tr></table></figure>
-<p>查找图片并且获取指定 <code>key</code> 的图片</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 异步在磁盘上查找指定 key 的图片, 完成后回调 Block */</span></span><br><span class="line">- (<span class="built_in">NSOperation</span> *)queryDiskCacheForKey:(<span class="built_in">NSString</span> *)key done:(SDWebImageQueryCompleteBlock)doneBlock;</span><br><span class="line"><span class="comment">/** 从内存获取指定 key 的图片 */</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)imageFromMemoryCacheForKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">/** 从磁盘获取指定 key 的图片 */</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)imageFromDiskCacheForKey:(<span class="built_in">NSString</span> *)key;</span><br></pre></td></tr></table></figure>
-<h3 id="数据本地存储"><a href="#数据本地存储" class="headerlink" title="数据本地存储"></a>数据本地存储</h3><p>数据存储是个极其简单的事情, 无非是将 <code>JSON</code> 数据本地化, <code>plist</code> 文件或者数据库都能实现. </p>
-<p>因为图方便, 我使用 <code>plist</code> 文件进行存储. 但也遇到了一些问题, 就是在使用 <code>NSUserDefault</code> 存储数据时, 出现了 <code>Attempt to set a non-property-list object</code>的问题. 按字面意思翻译为”不能设置一个没在属性列表中的对象”, 即存储类型中有非系统类型的自定义对象.</p>
-<p>为了解决这个问题, 需要将对象编码为 <code>NSData</code> 类型的对象后再存储, 而提取时需要解码.</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对数组进行编码并且储存数据</span></span><br><span class="line"><span class="built_in">NSData</span> *data = [<span class="built_in">NSKeyedArchiver</span> archivedDataWithRootObject:cakeModelArray];</span><br><span class="line">[[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:data forKey:<span class="string">@"cakeModelArray"</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取数据并解码成数组</span></span><br><span class="line"><span class="built_in">NSData</span> *data = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] objectForKey: <span class="string">@"cakeModelArray"</span>];</span><br><span class="line">_cakeModelArray = [<span class="built_in">NSKeyedUnarchiver</span> unarchiveObjectWithData:data];</span><br></pre></td></tr></table></figure>
-<p>本以为用了以上方法就能成功, 但是错误提示还是没有改变. 经过资料查询后, 找到问题所在: 自定义类型需要遵守 <code>NSCoding</code> 协议, 并且实现编码解码方法, 对其中的属性进行处理.</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LeCakeShopModel</span> : <span class="title">NSObject</span> &lt;<span class="title">NSCoding</span>&gt;</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *img;</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *tag;</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>)<span class="built_in">NSMutableArray</span> *goods;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LeCakeShopModel</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 重写解码方法</span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithCoder:(<span class="built_in">NSCoder</span> *)aDecoder</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init]) &#123;</span><br><span class="line">        <span class="keyword">self</span>.img = [aDecoder decodeObjectForKey:<span class="string">@"img"</span>];</span><br><span class="line">        <span class="keyword">self</span>.tag = [aDecoder decodeObjectForKey:<span class="string">@"tag"</span>];</span><br><span class="line">        <span class="keyword">self</span>.goods = [aDecoder decodeObjectForKey:<span class="string">@"goods"</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重写编码方法</span></span><br><span class="line">- (<span class="keyword">void</span>)encodeWithCoder:(<span class="built_in">NSCoder</span> *)aCoder</span><br><span class="line">&#123;</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.img forKey:<span class="string">@"img"</span>];</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.tag forKey:<span class="string">@"tag"</span>];</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.goods forKey:<span class="string">@"goods"</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>之前对 <code>SDWebImage</code> 框架的理解还是停留在很浅层的地方, 亦不涉及原理. 这次比较深入的使用以后, 发现 <code>SDWebImage</code> 的强大所在. 也是提醒自己, 深受推广的框架必有惊人之处.</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/24/iOS_ApplyPay/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -967,6 +790,183 @@
 <li><a href="http://www.jianshu.com/p/9ec40755ba35" target="_blank" rel="noopener">iOS App集成Apple Pay 编程指南（中国版）</a></li>
 <li><a href="http://www.th7.cn/Program/IOS/201603/771495.shtml" target="_blank" rel="noopener">IOS-APP提交上架流程</a></li>
 </ol>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/06/24/iOS离线模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ZeroJi">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/icon.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZeroJi's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2016/06/24/iOS离线模式/" itemprop="url">iOS离线模式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-06-24T02:00:00+08:00">
+                2016-06-24
+              </time>
+            
+
+            
+              <span class="post-meta-divider">|</span>
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于&#58;</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-04-28T17:02:59+08:00">
+                2018-04-28
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/iOS/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="离线模式"><a href="#离线模式" class="headerlink" title="离线模式"></a>离线模式</h3><p>这几天公司有新需求, 当网络异常或没有网络时显示上次显示过的页面. 我将这个需求剖析开来, 分成两个问题:</p>
+<ol>
+<li>完成图片缓存</li>
+<li>完成数据本地存储</li>
+</ol>
+<p>接下来的开发就围绕这两个问题进行解决.</p>
+<h3 id="图片缓存"><a href="#图片缓存" class="headerlink" title="图片缓存"></a>图片缓存</h3><p>说起图片时, 我第一个是想到了 <code>SDWebImage</code>, 但因为之前没有深入研究过, 做了不少的傻事. 例如: 将 <code>SDWebImage</code> 再次封装成一个延展, 手动实现图片的本地缓存, 手动搜索并判断图片的存在, 手动提取本地图片等. 但是后来发现, 只要调用 <code>sd_setImage:</code> 这个方法, 本地会出现两张同名的图片, 实在令人费解. 经过测试后确认, 以上的一切 <code>SDWebImage</code> 已经帮我们做好了. 仅仅只要调用 <code>sd</code> 开头的设置图片方法, 就能自动进行本地缓存.</p>
+<p><code>SDWebImage</code> 缓存图片的原理, 在我个人的理解上是: 显示占位图-&gt; 从内存中查找图片 -&gt; 从磁盘中查找图片 -&gt; 根据 <code>url</code> 下载图片 -&gt; 显示图片. 当从内存或磁盘中找到图片时, 直接略过后面步骤显示图片.</p>
+<p>当然, 手动图片缓存图片也有它的可取之处, 灵活性很高, 可以自行判断是否缓存图片, 自定义图片缓存地址, 最大并发数, 图片缓存策略等.</p>
+<p>本地缓存类 <code>SDWebImage</code> 中的 <code>SDImageCache</code>. <code>SDImageCache</code> 是个单例类, 使用以下代码获取. 这样图片缓存路径为沙盒路径下的<code>Library/Caches/default</code>.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 直接获取默认对象 */</span></span><br><span class="line">+ (SDImageCache *)sharedImageCache;</span><br></pre></td></tr></table></figure>
+<p>当然, 自定义缓存空间也是可行的.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 在沙盒的cache目录下创建一个指定名字的缓存空间(文件夹) */</span></span><br><span class="line">- (instanstype)initWithNamespace:(<span class="built_in">NSString</span> *)ns;</span><br></pre></td></tr></table></figure>
+<p>存储图片到内存和磁盘上</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 在内存和磁盘上存储一个图片(key参数是图片的唯一标识符) */</span></span><br><span class="line">- (<span class="keyword">void</span>)storeImage:(<span class="built_in">UIImage</span> *)image forkey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">/** 缓存一个图片到内存, 并设置是否缓存到磁盘上 */</span></span><br><span class="line">- (<span class="keyword">void</span>)storeImage:(<span class="built_in">UIImage</span> *)image forKey:(<span class="built_in">NSString</span> *)key toDisk:(<span class="built_in">BOOL</span>)toDisk;</span><br></pre></td></tr></table></figure>
+<p>查找图片并且获取指定 <code>key</code> 的图片</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** 异步在磁盘上查找指定 key 的图片, 完成后回调 Block */</span></span><br><span class="line">- (<span class="built_in">NSOperation</span> *)queryDiskCacheForKey:(<span class="built_in">NSString</span> *)key done:(SDWebImageQueryCompleteBlock)doneBlock;</span><br><span class="line"><span class="comment">/** 从内存获取指定 key 的图片 */</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)imageFromMemoryCacheForKey:(<span class="built_in">NSString</span> *)key;</span><br><span class="line"><span class="comment">/** 从磁盘获取指定 key 的图片 */</span></span><br><span class="line">- (<span class="built_in">UIImage</span> *)imageFromDiskCacheForKey:(<span class="built_in">NSString</span> *)key;</span><br></pre></td></tr></table></figure>
+<h3 id="数据本地存储"><a href="#数据本地存储" class="headerlink" title="数据本地存储"></a>数据本地存储</h3><p>数据存储是个极其简单的事情, 无非是将 <code>JSON</code> 数据本地化, <code>plist</code> 文件或者数据库都能实现. </p>
+<p>因为图方便, 我使用 <code>plist</code> 文件进行存储. 但也遇到了一些问题, 就是在使用 <code>NSUserDefault</code> 存储数据时, 出现了 <code>Attempt to set a non-property-list object</code>的问题. 按字面意思翻译为”不能设置一个没在属性列表中的对象”, 即存储类型中有非系统类型的自定义对象.</p>
+<p>为了解决这个问题, 需要将对象编码为 <code>NSData</code> 类型的对象后再存储, 而提取时需要解码.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 对数组进行编码并且储存数据</span></span><br><span class="line"><span class="built_in">NSData</span> *data = [<span class="built_in">NSKeyedArchiver</span> archivedDataWithRootObject:cakeModelArray];</span><br><span class="line">[[<span class="built_in">NSUserDefaults</span> standardUserDefaults] setObject:data forKey:<span class="string">@"cakeModelArray"</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取数据并解码成数组</span></span><br><span class="line"><span class="built_in">NSData</span> *data = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] objectForKey: <span class="string">@"cakeModelArray"</span>];</span><br><span class="line">_cakeModelArray = [<span class="built_in">NSKeyedUnarchiver</span> unarchiveObjectWithData:data];</span><br></pre></td></tr></table></figure>
+<p>本以为用了以上方法就能成功, 但是错误提示还是没有改变. 经过资料查询后, 找到问题所在: 自定义类型需要遵守 <code>NSCoding</code> 协议, 并且实现编码解码方法, 对其中的属性进行处理.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">LeCakeShopModel</span> : <span class="title">NSObject</span> &lt;<span class="title">NSCoding</span>&gt;</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *img;</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">copy</span>)<span class="built_in">NSString</span> *tag;</span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>)<span class="built_in">NSMutableArray</span> *goods;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">LeCakeShopModel</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 重写解码方法</span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithCoder:(<span class="built_in">NSCoder</span> *)aDecoder</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init]) &#123;</span><br><span class="line">        <span class="keyword">self</span>.img = [aDecoder decodeObjectForKey:<span class="string">@"img"</span>];</span><br><span class="line">        <span class="keyword">self</span>.tag = [aDecoder decodeObjectForKey:<span class="string">@"tag"</span>];</span><br><span class="line">        <span class="keyword">self</span>.goods = [aDecoder decodeObjectForKey:<span class="string">@"goods"</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 重写编码方法</span></span><br><span class="line">- (<span class="keyword">void</span>)encodeWithCoder:(<span class="built_in">NSCoder</span> *)aCoder</span><br><span class="line">&#123;</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.img forKey:<span class="string">@"img"</span>];</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.tag forKey:<span class="string">@"tag"</span>];</span><br><span class="line">    [aCoder encodeObject:<span class="keyword">self</span>.goods forKey:<span class="string">@"goods"</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>之前对 <code>SDWebImage</code> 框架的理解还是停留在很浅层的地方, 亦不涉及原理. 这次比较深入的使用以后, 发现 <code>SDWebImage</code> 的强大所在. 也是提醒自己, 深受推广的框架必有惊人之处.</p>
 
           
         
