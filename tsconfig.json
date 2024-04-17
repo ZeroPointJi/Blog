@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "outDir": "./tsOutDir/",
+    "strict": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    // "noUnusedLocals": true,
+    "allowUnreachableCode": false,
+    "module": "ESNext",
+    "target": "es5",
+    "jsx": "preserve",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "lib": ["DOM", "ESNext"],
+    "paths": {
+      "@": ["./pages/"]
+    },
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "include": ["pages/**/*", "components/**/*", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
