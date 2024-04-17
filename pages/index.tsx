@@ -44,7 +44,10 @@ export default function Home({ allPostsData }: InferGetStaticPropsType<typeof ge
 }
 
 export const getStaticProps: GetStaticProps<{ allPostsData: PostsData[] }> = async () => {
+  console.time('allPostsData');
   const allPostsData = getSortedPostsData();
+  console.timeEnd('allPostsData');
+  console.log(allPostsData);
   return {
     props: {
       allPostsData
