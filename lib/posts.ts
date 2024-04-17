@@ -17,11 +17,11 @@ export declare interface PostsData {
 export function getSortedPostsData(): PostsData[] {
   // Get file names under /posts
   const fileNames = fs.readdirSync(postsDirectory).filter((fileName) => {
-    return fileName.search(/(\.md)|(\.markdown)$/) > -1;
+    return fileName.search(/\.md$/) > -1;
   });
   const allPostsData: PostsData[] = fileNames.map((fileName) => {
     // Remove ".md" from file name to get id
-    const id = fileName.replace(/(\.md)|(\.markdown)$/, '');
+    const id = fileName.replace(/\.md$/, '');
 
     // Read markdown file as string
     const fullPath = path.join(postsDirectory, fileName);
@@ -30,7 +30,7 @@ export function getSortedPostsData(): PostsData[] {
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
     if (matterResult.data.date) {
-      matterResult.data.date = matterResult.data.date.toString();
+      matterResult.data.date = matterResult.data.date.toString(); // 转换 date 类型为 string
     }
 
     // Combine the data with the id
