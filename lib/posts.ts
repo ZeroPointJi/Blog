@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
+import { format } from 'date-fns';
 
 const postsDirectory = path.join(process.cwd(), 'posts');
 
@@ -30,7 +31,7 @@ export function getSortedPostsData(): PostsData[] {
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
     if (matterResult.data.date) {
-      matterResult.data.date = matterResult.data.date.toString(); // 转换 date 类型为 string
+      matterResult.data.date = format(matterResult.data.date, 'yyyy-MM-dd');
     }
 
     // Combine the data with the id
