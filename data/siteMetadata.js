@@ -68,7 +68,7 @@ const siteMetadata = {
       inputPosition: 'top',
       // theme example: light, dark, dark_dimmed, dark_high_contrast
       // transparent_dark, preferred_color_scheme, custom
-      theme: 'light',
+      theme: 'preferred_color_scheme',
       // theme when dark mode
       // darkTheme: 'transparent_dark',
       lang: 'zh-CN',
